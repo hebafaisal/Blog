@@ -1,23 +1,33 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Post, Body, Param, Get, UseGuards ,Request} from '@nestjs/common';
+import { Controller, Post, Body, Param, Patch, Req} from '@nestjs/common';
 import { CommentService } from './comments.service'; 
 import { CreateCommentDto } from './dto/Create-comment-dto';
-import { JwtGuard } from 'src/auth/JwtAuthGuard/jwt.guard';
+import { UpdateCommentDto } from './dto/Update-comment-dto';
+// import { JwtGuard } from 'src/auth/JwtAuthGuard/jwt.guard';
 
-@Controller('comments')
+@Controller('comment')
 export class CommentController {
-  constructor(private readonly commentService: CommentService) {}
-
-  @Post()
-  @UseGuards(JwtGuard)
-  async createComment(@Body() createCommentDto: CreateCommentDto, @Request() req) {
-    const userId = req.user.id;
-    return this.commentService.createComment(createCommentDto, userId);
+  constructor(private readonly commentService: CommentService) { }
+  
+  @Post('/new-comment')
+  create(@Body() createCommentDto: CreateCommentDto, @Req() req: any) {
+    const user = req.user;
+    const { articleId } = createCommentDto; 
+    return this.commentService.createComment(createCommentDto, user, articleId);
   }
 
-  @Get('article/:id')
-  async getCommentsForArticle(@Param('id') articleId: number) {
-    return this.commentService.getCommentsForArticle(articleId);
+  @Patch(':id')
+  update(@Param('id') id: number, @Body() updateCommentDto: UpdateCommentDto, @Req() req: any) {
+    const user = req.user;
+    return this.commentService.update(id, updateCommentDto, user);
   }
+
+//   @Delete(':id')
+//   async delete(@Param('id') id: number,
+//   @Req() req: any) {
+//   const user = req.user;
+//   return this.commentService.delete(id, user);
+  // }
+  
 }
 

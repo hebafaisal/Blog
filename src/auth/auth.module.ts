@@ -1,19 +1,18 @@
 /* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
-import { UserModule } from '../user/user.module';
 import { JwtModule } from '@nestjs/jwt';
-
+import { JwtStrategy } from './strategy/jwt.strategy';
+import { JwtAuthGuard } from './jwt-auth.guard';
+import { PassportModule } from '@nestjs/passport';
 @Module({
    imports: [
+    PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '60s' },
+      secret: process.env.JWT_SECRET, 
+      signOptions: { expiresIn: '1h' }, 
     }),
-    UserModule, 
   ],
-  providers: [AuthService],
-  controllers: [AuthController],
+  providers: [JwtStrategy, JwtAuthGuard],
+  exports: [JwtModule, JwtAuthGuard],
 })
 export class AuthModule {}

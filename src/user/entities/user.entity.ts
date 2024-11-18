@@ -5,7 +5,6 @@ import { Comment } from 'src/comments/entities/comment/comment';
 
 @Entity('user')
 export class User {
-    [x: string]: any;
     @PrimaryGeneratedColumn()
     id?: number;
 
@@ -19,7 +18,7 @@ export class User {
     password: string;
     
     @OneToMany(() => Article, (article) => article.user)
-  articles: Article[];
+    articles: Article[];
 
   @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];

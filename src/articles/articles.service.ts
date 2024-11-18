@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Article } from './entities/article.entity';
@@ -19,7 +19,7 @@ export class ArticleService {
   const user = await this.userRepository.findOne({ where: { id: userId } });
 
   if (!user) {
-    throw new Error(`User with ID ${userId} not found`);
+    throw new Error(`User ID: ${userId} not found`);
   }
 
   const article = this.articleRepository.create({ ...createArticleDto, user });
@@ -31,10 +31,16 @@ export class ArticleService {
   }
 
   async findOne(id: number): Promise<Article> {
-  return this.articleRepository.findOne({
+  const article = await this.articleRepository.findOne({
     where: { id }, 
     relations: ['user', 'comments'], 
   });
+    
+  if (!article) {
+    throw new Error(`Article with ID ${id} not found`);
+    }
+    
+  return article;  
 }
     
   async deleteArticle(id: number, userId: number): Promise<void> {
@@ -42,8 +48,13 @@ export class ArticleService {
 
     if (article && article.user.id === userId) {
       await this.articleRepository.delete(id);
-    } else {
+    }
+    if (article.user.id !== userId) {
+      throw new UnauthorizedException(`You cannot delete this article`);
+    }
+    if (!article) {
       throw new Error('Article not found');
     }
   }
+  
 }

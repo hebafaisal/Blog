@@ -1,40 +1,43 @@
 /* eslint-disable prettier/prettier */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable prettier/prettier */
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
 import { User } from '../user/entities/user.entity';
+import { LoginResponseDTO } from './dto/login-response';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
-  async validateUser(username: string, password: string): Promise<any> {
-    const user = await this.usersService.findByUserName(username);
+  async validateUser(email: string, password: string) {
+    const user: User = await this.usersService.findByEmail(email);
 
     if (!user) {
-      return null;
+      throw new BadRequestException('User not found');
     }
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (passwordMatch) {
-      const { password, ...result } = user; 
-      return result;
+    const isMatch: boolean = bcrypt.compareSync(password, user.password);;
+    if (!isMatch) {
+      throw new BadRequestException('Password does not match');
     }
 
-    return null;
+    return user;
   }
 
-  async login(user: User) {
-    const payload = { username: user.username, sub: user.id };
+  async login(user: User): Promise<LoginResponseDTO> {
+    const payload = { email: user.email, sub: user.id };
     return {
-      access_token: this.jwtService.sign(payload),
+      accessToken: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        username: user.name,
+        email: user.email,
+      },
     };
   }
-}
 
+}

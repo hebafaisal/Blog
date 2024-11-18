@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -14,11 +15,11 @@ export class UsersService {
     
   async createUser(name: string, email: string, password: string): Promise<User> {
     const hashedPassword = await bcrypt.hash(password, 10); 
-    const user = this.userRepository.create({ email, password: hashedPassword });
+    const user = this.userRepository.create({ name,email, password: hashedPassword });
     return this.userRepository.save(user); 
     }
     
-    async findByUserName(name: string): Promise<User | undefined> {
+    async findByName(name: string): Promise<User | undefined> {
         return this.userRepository.findOne({ where: { name }  });
   }
 
@@ -26,8 +27,23 @@ export class UsersService {
       return this.userRepository.findOne({ where:{ email } });
   }
 
-    async findById(id: number): Promise<User | undefined> {
-        return this.userRepository.findOne({ where:{ id } });
-  }
+  async update(name: string, updateUserDto: UpdateUserDto) {
+    const existingUser = this.userRepository.findOneBy({ name });
     
+    if (!existingUser) { 
+       throw new Error(`User not found`);
+    }
+    return await this.userRepository.update(name, updateUserDto);
+  }
+  
+   async delete(name?: string, email?: string) {
+     if (name) {
+       await this.userRepository.delete({ name });
+      } else if (email) {
+       await this.userRepository.delete({ email });
+     } else {
+       throw new Error('You must provide either a name or an email to delete a user>');
+  }
+  }
+
 }

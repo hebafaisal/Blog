@@ -3,43 +3,69 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Comment } from './entities/comment/comment';
+import { CreateCommentDto } from './dto/Create-comment-dto';
 import { Article } from 'src/articles/entities/article.entity';
 import { User } from 'src/user/entities/user.entity';
-import { CreateCommentDto } from './dto/Create-comment-dto';
+import { UpdateCommentDto } from './dto/Update-comment-dto';
 
 @Injectable()
 export class CommentService {
   constructor(
     @InjectRepository(Comment)
     private commentRepository: Repository<Comment>,
-    @InjectRepository(Article)
-    private articleRepository: Repository<Article>,
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
+    @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Article) private articleRepository: Repository<Article>,
   ) {}
   
-  async createComment(createCommentDto: CreateCommentDto, userId: number): Promise<Comment> {
-    const { content, articleId } = createCommentDto;
-    
+  async createComment(createCommentDto: CreateCommentDto, user: User, articleId: number): Promise<Comment> {
     const article = await this.articleRepository.findOne({ where: { id: articleId } });
-    if (!article) {
-      throw new Error(`Article with ID ${articleId} not found`);
+    if (!articleId) {
+      throw new Error('The article no longer exists.');
     }
-
-    const user = await this.userRepository.findOne({ where: { id: userId } });
-    if (!user) {
-      throw new Error(`User with ID ${userId} not found`);
-    }
-
-    const comment = this.commentRepository.create({ content, article, user });
+    const comment = await this.commentRepository.create({
+      content: createCommentDto.content,
+      user: user,
+      article: article,
+    });
     return this.commentRepository.save(comment);
   }
 
-  async getCommentsForArticle(articleId: number): Promise<Comment[]> {
-    return this.commentRepository.find({
-      where: { article: { id: articleId } },
-      relations: ['user'],
+   async update(id: number, updateCommentDto: UpdateCommentDto, user: User) {
+    const existingComment = await this.commentRepository.findOne({
+        where: { id },
+        relations: ['user'], 
     });
+     
+    if (existingComment.user.id !== user.id) {
+        throw new Error("You don't have permission to update this comment");
+    }
+
+    if (!existingComment) {
+        throw new Error(`Comment ID: ${id} not found`);
+     }
+    
+    existingComment.content = updateCommentDto.content;
+    await this.commentRepository.save(existingComment);
+    return existingComment; 
   }
+
+  async delete(id: number, user: User) {
+    const existingComment = await this.commentRepository.findOne({
+        where: { id },
+        relations: ['user'], 
+    });
+     
+    if (existingComment.user.id !== user.id) {
+        throw new Error("You don't have permission to update this comment");
+    }
+
+    if (!existingComment) {
+        throw new Error(`Comment ID: ${id} not found`);
+     }
+    
+    await this.commentRepository.delete(id);
+    return `This comment has been deleted successfully`;
+  }
+
 }
 

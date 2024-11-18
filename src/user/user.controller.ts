@@ -8,7 +8,7 @@ import { CreateUserDto } from './dto/Create-user-dto';
 export class UsersController {
     constructor(private readonly usersService: UsersService) { }
     
-    @Post('register')
+  @Post('register')
   async register(@Body() createUserDto: CreateUserDto): Promise<User> {
     const {username, email, password } = createUserDto;
     return this.usersService.createUser(username, email, password); 
@@ -24,14 +24,8 @@ export class UsersController {
     return user;
   }
 
-  @Get(':id')
-  async findById(@Param('id') id: number): Promise<User> {
-    const user = await this.usersService.findById(id);
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
-    return user;
-  }
-
+  // update(@Param('userName') userName: string, @Body() updateUserDto: UpdateUserDto) {
+  //   return this.usersService.update(userName, updateUserDto);
+  // }
 }
 

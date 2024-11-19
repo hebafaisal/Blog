@@ -28,10 +28,10 @@ export class UsersService {
   }
 
   async update(name: string, updateUserDto: UpdateUserDto) {
-    const existingUser = this.userRepository.findOneBy({ name });
+    const existingUser = await this.userRepository.findOneBy({ name });
     
     if (!existingUser) { 
-       throw new Error(`User not found`);
+       throw new Error(`${existingUser} not found`);
     }
     return await this.userRepository.update(name, updateUserDto);
   }
@@ -43,7 +43,47 @@ export class UsersService {
        await this.userRepository.delete({ email });
      } else {
        throw new Error('You must provide either a name or an email to delete a user>');
-  }
+      }
   }
 
+  async follow(followerId: number, followeeId: number) { 
+    const follower = await this.userRepository.findOne({ where: { id: followerId }, relations: ['following'] });
+    const followee = await this.userRepository.findOne({ where: { id: followeeId }, relations: ['followers'] });
+
+    if (!follower || !followee) { 
+      throw new Error('User not found');
+    }
+
+    if (!follower.following) {
+      follower.following = [];
+    }
+
+    follower.following.push(followee);
+    await this.userRepository.save(follower);
+
+  }
+
+  async unfollow(followerId: number, followeeId: number) {
+     const follower = await this.userRepository.findOne({ where: { id: followerId }, relations: ['following'] });
+    const followee = await this.userRepository.findOne({ where: { id: followeeId }, relations: ['followers'] });
+
+    if (!follower || !followee) { 
+      throw new Error('User not found');
+    }
+
+    follower.following = follower.following.filter(user => user.id !== followeeId);
+    await this.userRepository.save(follower);
+
+  }
+
+  async findOne(id: number) {
+     const user = await this.userRepository.findOne({
+      where: { id }, relations: ['followers', 'following'] });
+    
+    if (!user) { 
+      throw new Error(`User with ID ${id} not found`);
+    }
+    return user;
+  }
+  
 }

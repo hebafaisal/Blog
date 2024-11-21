@@ -6,7 +6,8 @@ import { CreateUserDto } from './dto/Create-user-dto';
 
 @Controller('users') 
 export class UsersController {
-    constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) { 
+  }
     
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto): Promise<User> {
@@ -43,27 +44,29 @@ export class UsersController {
     return user;
   }
 
-  @Get('/:id/followers')
-  async followers(@Param('id') id: number, @Req() response: Response) { 
-    const user = await this.usersService.findOne(id); 
-    if (!user) { 
-      throw new Error(`${user} not found`);
-    }
-    return response.json(user.followers);
+ @Get('/:id/followers')
+async followers(@Param('id') id: number) {
+  const user = await this.usersService.findOne(id);
+  if (!user) {
+    throw new Error(`User with id ${id} not found`);
   }
+  return user.followers; 
+}
 
-  @Get('/:id/following')
-  async following(@Param('id') id: number, @Req() response: Response) { 
-    const user = await this.usersService.findOne(id); 
-    if (!user) { 
-      throw new Error(`${user} not found`);
-    }
-    return response.json(user.following);
+@Get('/:id/following')
+async following(@Param('id') id: number) {
+  const user = await this.usersService.findOne(id);
+  if (!user) {
+    throw new Error(`User with id ${id} not found`);
   }
+  return user.following;
+}
 
-  // update(@Param('userName') userName: string, @Body() updateUserDto: UpdateUserDto) {
-  //   return this.usersService.update(userName, updateUserDto);
-  // }
+ @Post('/fillUsers')
+  async fillUsers() {
+  await this.usersService.fillUsers(); 
+   return 'Users filled successfully!';
+ }
 
 }
 

@@ -5,7 +5,7 @@ import { Comment } from 'src/comments/entities/comment/comment';
 
 @Entity('user')
 export class User {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn("uuid")
     id?: number;
 
     @Column()
@@ -24,22 +24,22 @@ export class User {
   comments: Comment[];
 
   //represents who follows the current user
-  @ManyToMany(() => User, (user) => user.following) 
+    @ManyToMany(() => User, (user) => user.following)
     @JoinTable({
-        name: 'followers',
-        joinColumn: {
-            name: 'follower_id',
-            referencedColumnName: 'id',
-        },
-        inverseJoinColumn: {
-            name: 'followee_id',
-            referencedColumnName: 'id',
-        },
-    })
+    name: 'followers',
+    joinColumn: {
+      name: 'follower_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'followee_id',
+      referencedColumnName: 'id',
+    },
+  })
   followers: User[];
-  
-  //represents who the current user is following
-    @ManyToMany(() => User, (user) => user.followers)
-    following: User[];
+
+  // Represents who the current user is following
+  @ManyToMany(() => User, (user) => user.followers)
+  following: User[];
 
 }

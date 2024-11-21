@@ -5,13 +5,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { faker } from '@faker-js/faker';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    ) { }
+  ) { }
     
   async createUser(name: string, email: string, password: string): Promise<User> {
     const hashedPassword = await bcrypt.hash(password, 10); 
@@ -86,4 +87,40 @@ export class UsersService {
     return user;
   }
   
+  async fillUsers() {
+    // const chunkSize = 10_000;
+    // const totalUsers = 1_000_000;
+    const chunkSize = 10_000;
+    const totalUsers = 100_000;
+    const users = [];
+
+    for (let i = 0; i < totalUsers; i++) {
+      const randomName =  faker.internet.userName();
+      const randomEmail = faker.internet.email();
+      const randomPass =  faker.internet.password();
+      const randomID =  faker.string.uuid();
+      
+      users.push({
+        name: randomName,
+        email: randomEmail,
+        password: randomPass,
+        id : randomID,
+      });
+
+
+      if (users.length === chunkSize) {
+        console.log('Inserting chunk Number:', i / chunkSize);
+        console.log('Percentage done:', (i / totalUsers) * 100 + '%');
+        await this.userRepository.insert(users);
+        users.length = 0; // clear the array
+      }
+    }
+
+    // Insert any remaining users
+    if (users.length > 0) {
+      await this.userRepository.insert(users);
+    }
+
+    return 'done';
+  }
 }

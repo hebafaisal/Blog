@@ -1,8 +1,8 @@
 /* eslint-disable prettier/prettier */
+// import { Article } from 'src/articles/entities/article.entity';
+import { Article } from '../../../articles/entities/article.entity';
+import { User } from '../../../user/entities/user.entity';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { Article } from 'src/articles/entities/article.entity';
-import { User } from 'src/user/entities/user.entity';
-
 @Entity('comment')
 export class Comment {
  @PrimaryGeneratedColumn()

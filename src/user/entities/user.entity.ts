@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 import { Article } from '../../articles/entities/article.entity'; 
-import { Comment } from '../../comments/entities/comment/comment'; 
+import { Comment } from '../../comments/entities/comment/comment.entity'; 
 
 @Entity('user')
 export class User {
@@ -15,7 +15,11 @@ export class User {
     email: string;
 
     @Column()
-    password: string;
+  password: string;
+
+  // @Column()
+  // age: number;
+  
     
     @OneToMany(() => Article, (article) => article.user)
     articles: Article[];

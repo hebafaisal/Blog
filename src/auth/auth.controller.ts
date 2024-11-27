@@ -1,8 +1,8 @@
 /* eslint-disable prettier/prettier */
 import { Controller, Post, BadRequestException, UseGuards } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { AuthService } from '../auth/auth.service';
 import { AuthGuard } from '@nestjs/passport';
-import { LoginResponseDTO } from './dto/login-response';
+import { LoginResponseDTO } from '../auth/dto/login-response';
 import { Request } from '@nestjs/common';
 
 @Controller('auth')

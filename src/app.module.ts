@@ -1,32 +1,38 @@
 /* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserModule } from './user/user.module';
-import { ConfigModule } from '@nestjs/config';
-import { ArticlesModule } from './articles/articles.module';
-import { AuthModule } from './auth/auth.module';
-import { CommentsModule } from './comments/comments.module';
 import { DataSource } from 'typeorm';
 import { User } from './user/entities/user.entity';
 import { Article } from './articles/entities/article.entity';
-import { Comment } from './comments/entities/comment/comment';
-// const entitiesPath = __dirname + '/**/*.entity{.ts,.js}';
-@Module({ 
+import { Comment } from './comments/entities/comment/comment.entity';
+import { UserModule } from './user/user.module';
+import { ArticlesModule } from './articles/articles.module';
+import { AuthModule } from './auth/auth.module';
+import { CommentsModule } from './comments/comments.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+
+@Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, 
-    }), 
-    TypeOrmModule.forRoot({
-      type: "mysql",
-      host: process.env.DB_HOST,
-      port: +process.env.DB_PORT,
-      username: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      entities: [User, Article, Comment],
-      synchronize: false,
+      isGlobal: true,
+
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get<string>('DB_HOST'),
+        port: +configService.get<string>('DB_PORT'),
+        username: configService.get<string>('DB_USER', 'postgres'),
+        password: configService.get<string>('DB_PASSWORD',"Heba09876*"),
+        database: configService.get<string>('DB_NAME', 'blog-db'),
+        entities: [User, Article, Comment],
+        autoLoadEntities: true,
+        synchronize: true,
+      }),
     }),
     UserModule,
     ArticlesModule,
@@ -38,6 +44,5 @@ import { Comment } from './comments/entities/comment/comment';
 })
 export class AppModule {
   constructor(private dataSource: DataSource) { }
+  
 }
-
-

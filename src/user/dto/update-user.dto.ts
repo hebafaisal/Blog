@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { IsNotEmpty, IsEmail, IsString} from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
-import { CreateUserDto } from './Create-user-dto';
+import { CreateUserDto } from '../dto/Create-user-dto';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) { 
  @IsNotEmpty()

@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Test, TestingModule } from '@nestjs/testing';
-import { ArticleController } from './articles.controller';
+import { ArticleController } from '../articles/articles.controller';
 
 describe('ArticlesController', () => {
   let controller: ArticleController;

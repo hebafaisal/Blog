@@ -1,8 +1,8 @@
 /* eslint-disable prettier/prettier */
 import { Controller, Post, Body, Param, Patch, Req} from '@nestjs/common';
-import { CommentService } from './comments.service'; 
-import { CreateCommentDto } from './dto/Create-comment-dto';
-import { UpdateCommentDto } from './dto/Update-comment-dto';
+import { CommentService } from '../comments/comments.service'; 
+import { CreateCommentDto } from '../comments/dto/Create-comment-dto';
+import { UpdateCommentDto } from '../comments/dto/Update-comment-dto';
 // import { JwtGuard } from 'src/auth/JwtAuthGuard/jwt.guard';
 
 @Controller('comment')

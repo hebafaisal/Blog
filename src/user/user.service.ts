@@ -88,39 +88,45 @@ export class UsersService {
   }
   
   async fillUsers() {
-    // const chunkSize = 10_000;
-    // const totalUsers = 1_000_000;
-    const chunkSize = 10_000;
-    const totalUsers = 100_000;
-    const users = [];
+  const chunkSize = 10_000;
+  const totalUsers = 100_000;
+  const users = new Set();
+  const userChunks = [];
 
-    for (let i = 0; i < totalUsers; i++) {
-      const randomName =  faker.internet.userName();
-      const randomEmail = faker.internet.email();
-      const randomPass =  faker.internet.password();
-      const randomID =  faker.string.uuid();
-      
-      users.push({
-        name: randomName,
-        email: randomEmail,
-        password: randomPass,
-        id : randomID,
-      });
+  for (let i = 0; i < totalUsers; i++) {
+    let randomEmail;
+    let randomID;
 
+    do {
+      randomEmail = faker.internet.email();
+    } while (users.has(randomEmail));
 
-      if (users.length === chunkSize) {
-        console.log('Inserting chunk Number:', i / chunkSize);
-        console.log('Percentage done:', (i / totalUsers) * 100 + '%');
-        await this.userRepository.insert(users);
-        users.length = 0; // clear the array
-      }
+    do {
+      randomID = faker.string.uuid();
+    } while (users.has(randomID));
+
+    users.add(randomEmail);
+    users.add(randomID);
+
+    userChunks.push({
+      name: faker.internet.username(),
+      email: randomEmail,
+      password: faker.internet.password(),
+      id: randomID,
+    });
+
+    if (userChunks.length === chunkSize) {
+      console.log('Inserting chunk Number:', Math.floor(i / chunkSize));
+      console.log('Percentage done:', ((i + 1) / totalUsers) * 100 + '%');
+      await this.userRepository.insert(userChunks);
+      userChunks.length = 0; // Clear the chunk
     }
-
-    // Insert any remaining users
-    if (users.length > 0) {
-      await this.userRepository.insert(users);
-    }
-
-    return 'done';
   }
+
+  if (userChunks.length > 0) {
+    await this.userRepository.insert(userChunks);
+  }
+
+  return 'done';
+}
 }

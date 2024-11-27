@@ -2,9 +2,9 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Article } from './entities/article.entity';
-import { CreateArticleDto } from './dto/Create-article-dto ';
-import { User } from 'src/user/entities/user.entity';
+import { Article } from '../articles/entities/article.entity';
+import { CreateArticleDto } from '../articles/dto/Create-article-dto ';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class ArticleService {

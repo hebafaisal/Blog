@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Test, TestingModule } from '@nestjs/testing';
-import { ArticleService } from './articles.service';
+import { ArticleService } from '../articles/articles.service';
 
 describe('ArticlesService', () => {
   let service: ArticleService;

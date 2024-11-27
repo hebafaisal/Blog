@@ -1,66 +1,159 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prettier/prettier */
-import { Test} from '@nestjs/testing';
-import { UsersController } from './user.controller';
-import { UsersService } from './user.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from '../auth/auth.module';
-// import { NotFoundException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { UsersController } from './user.controller'; 
+import { UsersService } from './user.service'; 
+import { NotFoundException } from '@nestjs/common';
 
-describe('UserController', () => {
-  let userController: UsersController;
-  let userService: Partial<Record<keyof UsersService, jest.Mock>>;
+describe('UsersController', () => {
+  let controller: UsersController;
+  let service: UsersService;
 
- beforeEach(async () => {
-  const moduleRef = await Test.createTestingModule({
-    imports: [TypeOrmModule.forRoot(), AuthModule], // Adjust paths as needed
-    controllers: [UsersController],
-    providers: [UsersService],
-  }).compile();
+  // Mocking UsersService
+  const mockUsersService = {
+    createUser: jest.fn(),
+    findByEmail: jest.fn(),
+    follow: jest.fn(),
+    unfollow: jest.fn(),
+    findOne: jest.fn(),
+    fillUsers: jest.fn(),
+  };
 
-  const controller = moduleRef.get<UsersController>(UsersController);
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [UsersController],
+      providers: [
+        {
+          provide: UsersService,
+          useValue: mockUsersService,
+        },
+      ],
+    }).compile();
+
+    controller = module.get<UsersController>(UsersController);
+    service = module.get<UsersService>(UsersService);
   });
 
-  // Test for following method
+  it('should be defined', () => {
+    expect(controller).toBeDefined();
+  });
+
+  describe('register', () => {
+    it('should create a user successfully', async () => {
+      const createUserDto = { username: 'test', email: 'test@example.com', password: 'password' };
+      const result = { id: 1, ...createUserDto };
+
+      mockUsersService.createUser.mockResolvedValue(result);
+
+      const response = await controller.register(createUserDto);
+      expect(response).toEqual(result);
+      expect(mockUsersService.createUser).toHaveBeenCalledWith(createUserDto.username, createUserDto.email, createUserDto.password);
+    });
+  });
+
+  describe('findByEmail', () => {
+    it('should return a user by email', async () => {
+      const email = 'test@example.com';
+      const result = { id: 1, email, username: 'test' };
+
+      mockUsersService.findByEmail.mockResolvedValue(result);
+
+      const response = await controller.findByEmail(email);
+      expect(response).toEqual(result);
+    });
+
+    it('should throw NotFoundException if user is not found', async () => {
+      const email = 'notfound@example.com';
+
+      mockUsersService.findByEmail.mockResolvedValue(null);
+
+      await expect(controller.findByEmail(email)).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('follow', () => {
+    it('should follow another user successfully', async () => {
+      const followeeId = 2;
+      const request = { user: { id: 1 } };
+
+      mockUsersService.follow.mockResolvedValue(undefined);
+
+      await controller.follow(followeeId, request);
+      expect(mockUsersService.follow).toHaveBeenCalledWith(1, followeeId);
+    });
+  });
+
+  describe('unfollow', () => {
+    it('should unfollow a user successfully', async () => {
+      const followeeId = 2;
+      const request = { user: { id: 1 } };
+
+      mockUsersService.unfollow.mockResolvedValue(undefined);
+
+      await controller.unfollow(followeeId, request);
+      expect(mockUsersService.unfollow).toHaveBeenCalledWith(1, followeeId);
+    });
+  });
+
+  describe('getMyProfile', () => {
+    it('should return the current user profile', async () => {
+      const request = { user: { id: 1 } };
+      const result = { id: 1, username: 'test', email: 'test@example.com' };
+
+      mockUsersService.findOne.mockResolvedValue(result);
+
+      const response = await controller.getMyProfile(request);
+      expect(response).toEqual(result);
+    });
+  });
+
+  describe('followers', () => {
+    it('should return the followers of a user', async () => {
+      const id = 1;
+      const result = [{ id: 2, username: 'follower' }];
+
+      mockUsersService.findOne.mockResolvedValue({ followers: result });
+
+      const response = await controller.followers(id);
+      expect(response).toEqual(result);
+    });
+
+    it('should throw an error if user is not found', async () => {
+      const id = 999;
+
+      mockUsersService.findOne.mockResolvedValue(null);
+
+      await expect(controller.followers(id)).rejects.toThrowError('User with id 999 not found');
+    });
+  });
+
   describe('following', () => {
-    it('should return the following list for a user', async () => {
-      const mockFollowing = [{ id: 2, name: 'John Doe' }];
-      userService.findOne.mockResolvedValue({ id: 1, following: mockFollowing });
+    it('should return the users a user is following', async () => {
+      const id = 1;
+      const result = [{ id: 2, username: 'following' }];
 
-      const result = await userController.following(1);
-      expect(result).toEqual(mockFollowing);
-      expect(userService.findOne).toHaveBeenCalledWith(1);
+      mockUsersService.findOne.mockResolvedValue({ following: result });
+
+      const response = await controller.following(id);
+      expect(response).toEqual(result);
     });
 
-    it('should throw an error if the user is not found', async () => {
-      userService.findOne.mockResolvedValue(null);
+    it('should throw an error if user is not found', async () => {
+      const id = 999;
 
-      await expect(userController.following(99)).rejects.toThrow('User with id 99 not found');
+      mockUsersService.findOne.mockResolvedValue(null);
+
+      await expect(controller.following(id)).rejects.toThrowError('User with id 999 not found');
     });
   });
 
-  // // Test for getMyProfile method
-  // describe('getMyProfile', () => {
-  //   it('should return the profile of the logged-in user', async () => {
-  //     const mockRequest = { user: { id: 1 } };
-  //     const mockUser = { id: 1, name: 'John Doe', email: 'john@example.com' };
-  //     userService.findOne.mockResolvedValue(mockUser);
+  describe('fillUsers', () => {
+    it('should fill users successfully', async () => {
+      mockUsersService.fillUsers.mockResolvedValue(undefined);
 
-  //     const result = await userController.getMyProfile(mockRequest as any);
-  //     expect(result).toEqual(mockUser);
-  //     expect(userService.findOne).toHaveBeenCalledWith(1);
-  //   });
-  // });
-
-  // // Test for fillUsers method
-  // describe('fillUsers', () => {
-  //   it('should call the fillUsers service method and return a success message', async () => {
-  //     userService.fillUsers.mockResolvedValue();
-
-  //     const result = await userController.fillUsers();
-  //     expect(result).toEqual('Users filled successfully!');
-  //     expect(userService.fillUsers).toHaveBeenCalled();
-  //   });
-  // });
+      const response = await controller.fillUsers();
+      expect(response).toBe('Users filled successfully!');
+    });
+  });
 });

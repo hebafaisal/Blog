@@ -1,10 +1,10 @@
 /* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
-import { ArticleController } from './articles.controller';
-import { ArticleService } from './articles.service';
+import { ArticleController } from '../articles/articles.controller';
+import { ArticleService } from '../articles/articles.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Article } from './entities/article.entity';
-import { UserModule } from 'src/user/user.module';
+import { Article } from '../articles/entities/article.entity';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [

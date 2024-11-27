@@ -12,6 +12,11 @@ Before using indexing:
 After using indexing:
 ![Screenshot 2024-11-21 183257after](https://github.com/user-attachments/assets/677d5c41-1756-45ee-a43a-ffe2a8dcc90f)
 
+<<<<<<< HEAD
+=======
+## Render
+Production: https://blog-k412.onrender.com
+>>>>>>> Production
 
 
 

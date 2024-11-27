@@ -17,7 +17,6 @@ import { AppService } from './app.service';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -27,11 +26,11 @@ import { AppService } from './app.service';
         host: configService.get<string>('DB_HOST'),
         port: +configService.get<string>('DB_PORT'),
         username: configService.get<string>('DB_USER', 'postgres'),
-        password: configService.get<string>('DB_PASSWORD',"Heba09876*"),
-        database: configService.get<string>('DB_NAME', 'blog-db'),
+        password: configService.get<string>('DB_PASSWORD'), 
+        database: configService.get<string>('DB_NAME'),
         entities: [User, Article, Comment],
-        autoLoadEntities: true,
-        synchronize: true,
+        autoLoadEntities: false,
+        synchronize: false,
       }),
     }),
     UserModule,

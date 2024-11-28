@@ -12,9 +12,15 @@ Before using indexing:
 After using indexing:
 ![Screenshot 2024-11-21 183257after](https://github.com/user-attachments/assets/677d5c41-1756-45ee-a43a-ffe2a8dcc90f)
 
+<<<<<<< HEAD
 ## Deployment URL
 Production: https://blog-k412.onrender.com
 Staging: https://blog-1-qocz.onrender.com
+=======
+## Render
+Production: https://blog-k412.onrender.com
+
+>>>>>>> e428767a79a7d52c05c66f4ada357ffd53af5bcb
 
 ## Diagrams
 - Current system design for my project (this should include database + server + how the client communicates with them):

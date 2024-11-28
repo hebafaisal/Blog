@@ -120,7 +120,7 @@ describe('Users E2E Tests', () => {
     await request(app.getHttpServer())
       .put(`/articles/${article.body.id}`)
       .set('Authorization', `Bearer ${token}`)
-      .send({ title: 'Edited by author', body: 'Updated content.' })
+      .send({ Title: 'Edited by author', Body: 'Updated content.' })
       .expect(200);
   });
 });

@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Controller, Post, Body, Get, Param, Delete, Request, UseGuards } from '@nestjs/common';
-import { ArticleService } from 'src/articles/articles.service'; 
+import { ArticleService } from '../articles/articles.service'; 
 import { CreateArticleDto } from '../articles/dto/Create-article-dto '; 
 import { JwtAuthGuard } from '../auth/jwt-auth.guard'; 
 

@@ -41,14 +41,12 @@ describe('UsersController', () => {
 
   describe('register', () => {
     it('should create a user successfully', async () => {
-      const createUserDto = { username: 'test', email: 'test@example.com', password: 'password' };
-      const result = { id: 1, ...createUserDto };
-
-      mockUsersService.createUser.mockResolvedValue(result);
-
-      const response = await controller.register(createUserDto);
-      expect(response).toEqual(result);
-      expect(mockUsersService.createUser).toHaveBeenCalledWith(createUserDto.username, createUserDto.email, createUserDto.password);
+       const createUserDto = { name: 'test', email: 'test@example.com', password: 'password' }; 
+    const result = { id: 1, ...createUserDto };
+    mockUsersService.createUser.mockResolvedValue(result);
+    const response = await controller.register(createUserDto);
+    expect(response).toEqual(result);
+    expect(mockUsersService.createUser).toHaveBeenCalledWith(createUserDto); 
     });
   });
 

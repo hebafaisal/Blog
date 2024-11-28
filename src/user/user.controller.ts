@@ -9,13 +9,11 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) { 
   }
     
-  @Post('register')
+   @Post('register')
   async register(@Body() createUserDto: CreateUserDto): Promise<User> {
-    const {username, email, password } = createUserDto;
-    return this.usersService.createUser(username, email, password); 
+    return this.usersService.createUser(createUserDto); 
   }
   
-
   @Get('email/:email')
   async findByEmail(@Param('email') email: string): Promise<User> {
     const user = await this.usersService.findByEmail(email);

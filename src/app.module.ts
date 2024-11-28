@@ -1,11 +1,8 @@
 /* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule} from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { User } from './user/entities/user.entity';
-import { Article } from './articles/entities/article.entity';
-import { Comment } from './comments/entities/comment/comment.entity';
 import { UserModule } from './user/user.module';
 import { ArticlesModule } from './articles/articles.module';
 import { AuthModule } from './auth/auth.module';
@@ -13,35 +10,50 @@ import { CommentsModule } from './comments/comments.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
+const env = process.env.NODE_ENV;
+
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get<string>('DB_HOST'),
-        port: +configService.get<string>('DB_PORT'),
-        username: configService.get<string>('DB_USER', 'postgres'),
-        password: configService.get<string>('DB_PASSWORD'), 
-        database: configService.get<string>('DB_NAME'),
-        entities: [User, Article, Comment],
-        autoLoadEntities: false,
-        synchronize: false,
-      }),
-    }),
     UserModule,
     ArticlesModule,
     AuthModule,
     CommentsModule,
+
+    TypeOrmModule.forRoot(
+      env === 'test' ? {
+        type: "postgres",
+        host: process.env.TEST_DB_HOST,
+        port: +process.env.TEST_DB_PORT,
+        username: process.env.TEST_DB_USER,
+        password: process.env.TEST_DB_PASSWORD,
+        database: process.env.TEST_DB_NAME,
+        // autoLoadentities: false,
+        entities: [__dirname + '/entities/*.entity{.ts,.js}'],
+        synchronize: false,
+        logging: false,
+        migrationsRun:true,
+      } : {
+         type: "postgres",
+         host: process.env.DB_HOST,
+         port: +process.env.DB_PORT,
+         username: process.env.DB_USER,
+         password: process.env.DB_PASSWORD,
+         database: process.env.DB_NAME,
+        //  autoLoadentities: false,
+         entities: [__dirname + '/entities/*.entity{.ts,.js}'],
+         synchronize: false,
+         logging: false,
+         migrationsRun:true,
+      }   
+    ),
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {
-  constructor(private dataSource: DataSource) { }
-  
+  constructor(private dataSource: DataSource) {}
 }
+

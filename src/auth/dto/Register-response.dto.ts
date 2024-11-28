@@ -2,6 +2,6 @@
 import { AccessToken } from '../types/AccessToken';
 
 export type RegisterResponseDTO = {
-  user: { id: string; username: string, email: string };
+  user: { id: number; username: string, email: string };
   accessToken: AccessToken;
 };

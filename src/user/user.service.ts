@@ -2,10 +2,11 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { faker } from '@faker-js/faker';
+import * as bcrypt from 'bcrypt';
+import { CreateUserDto } from './dto/Create-user-dto';
 
 @Injectable()
 export class UsersService {
@@ -14,12 +15,13 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
   ) { }
     
-  async createUser(name: string, email: string, password: string): Promise<User> {
-    const hashedPassword = await bcrypt.hash(password, 10); 
-    const user = this.userRepository.create({ name,email, password: hashedPassword });
-    return this.userRepository.save(user); 
-    }
-    
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
+    const { email, name, password } = createUserDto;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = this.userRepository.create({ email, name, password: hashedPassword });
+    return this.userRepository.save(user);
+  }
+  
     async findByName(name: string): Promise<User | undefined> {
         return this.userRepository.findOne({ where: { name }  });
   }

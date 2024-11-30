@@ -20,9 +20,11 @@ Staging: https://blog-1-qocz.onrender.com
 
 ## Diagrams
 - Current system design for my project (this should include database + server + how the client communicates with them):
+- 
+![Screenshot 2024-11-30 140539](https://github.com/user-attachments/assets/13c6cbb0-8ee7-43b0-8ffe-7b5b08810f86)
 
-![Screenshot 2024-11-27 202226](https://github.com/user-attachments/assets/b5be8706-1984-415b-b950-98a10e7f694d)
 
 - Future design:
 
-![Screenshot 2024-11-27 202226](https://github.com/user-attachments/assets/d450ff0c-53ad-4635-8ae7-536259256157)
+![Screenshot 2024-11-28 230228fu](https://github.com/user-attachments/assets/e9961a48-fe30-4150-9ecf-626d9401eeaf)
+
